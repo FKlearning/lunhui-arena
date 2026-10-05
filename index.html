@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<title>轮回沙场 v0.9.6 · 苔庭遗梦</title>
+<title>轮回沙场 v0.9.7 · 苔庭遗梦</title>
 <style>
 :root{--ink:#24473e;--muted:#63745f;--paper:#fbf0cb;--paper2:#f0dfaa;--gold:#c38b36;--mint:#78b7a0;--night:#153d36;--border:#a58b51}
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -227,7 +227,7 @@ body.menu-open>.hud,body.menu-open>#skillbar,body.menu-open>#zuohuaBtn,body.menu
   <div id="saveWarn" style="display:none;font-size:12px;padding:8px 12px;border:1px solid #b79850;margin-bottom:10px;line-height:1.5">当前浏览器无法保存进度，关闭页面后数据会丢失。请在允许本地存储的浏览器中游玩。</div>
   <div class="howto"><div><b>移动</b>　摇杆 / WASD / 方向键</div><div><b>闪现</b>　习得后按 F 或蓝色按钮</div><div><b>坐化</b>　空格 · 保留 100% 遗念战力</div><div><b>质变</b>　每 60 秒迎战首领</div></div>
   <div class="intro-actions"><button class="btn btn-primary" id="startBtn">继续轮回</button><button class="btn btn-secondary" id="newGameBtn">新的轮回</button></div>
-  <div class="intro-footer"><span>WASD 移动 · 自动战斗 · ESC 暂停</span><button class="text-btn" id="introTutorialBtn">沙场手记</button><button class="text-btn sound-toggle" onclick="toggleSound()">音效：开</button><span>v0.9.6</span></div>
+  <div class="intro-footer"><span>WASD 移动 · 自动战斗 · ESC 暂停</span><button class="text-btn" id="introTutorialBtn">沙场手记</button><button class="text-btn sound-toggle" onclick="toggleSound()">音效：开</button><span>v0.9.7</span></div>
 </div></div>
 
 <div class="overlay" id="metaShopOverlay" role="dialog" aria-modal="true" aria-labelledby="shopTitle"><div class="card" id="metaShopCard">
@@ -936,6 +936,22 @@ function updateJoySize(){
 }
 updateJoySize();
 const keys={};
+const GAME_KEY_ALIASES=Object.freeze({
+  w:"KeyW",a:"KeyA",s:"KeyS",d:"KeyD",f:"KeyF",p:"KeyP",
+  arrowup:"ArrowUp",arrowdown:"ArrowDown",arrowleft:"ArrowLeft",arrowright:"ArrowRight",
+  " ":"Space",spacebar:"Space",escape:"Escape",esc:"Escape"
+});
+const LEGACY_GAME_KEYS=Object.freeze({
+  27:"Escape",32:"Space",37:"ArrowLeft",38:"ArrowUp",39:"ArrowRight",40:"ArrowDown",
+  65:"KeyA",68:"KeyD",70:"KeyF",80:"KeyP",83:"KeyS",87:"KeyW"
+});
+function getGameKey(ev){
+  let code=String(ev.code||"");
+  if(/^key[a-z]$/i.test(code))code="Key"+code.slice(-1).toUpperCase();
+  if(["KeyW","KeyA","KeyS","KeyD","KeyF","KeyP","ArrowUp","ArrowDown","ArrowLeft","ArrowRight","Space","Escape"].includes(code))return code;
+  const key=String(ev.key||"").toLowerCase();
+  return GAME_KEY_ALIASES[key]||LEGACY_GAME_KEYS[ev.keyCode||ev.which]||code;
+}
 const moveInput={x:0,y:0};
 const lastMoveDir={x:0,y:1};
 function playerMoveSpeed(){
@@ -1003,14 +1019,15 @@ canvas.addEventListener("lostpointercapture",pointerUp);
 addEventListener("blur",clearInput);
 document.addEventListener("visibilitychange",()=>{if(document.hidden)clearInput();});
 addEventListener("keydown",ev=>{
-  if(ev.code==="Space"&&ev.target.closest&&ev.target.closest("button,[role=button]")&&ev.target.getClientRects().length)return;
-  if(["Space","ArrowUp","ArrowDown","ArrowLeft","ArrowRight"].includes(ev.code))ev.preventDefault();
-  if(!ev.repeat&&ev.code==="Space"&&G.state==="playing")triggerZuohua(true);
-  if(!ev.repeat&&ev.code==="KeyF")doBlink();
-  if(!ev.repeat&&(ev.code==="Escape"||ev.code==="KeyP"))togglePause();
-  if(G.state==="playing")keys[ev.code]=true;
+  const gameKey=getGameKey(ev);
+  if(gameKey==="Space"&&ev.target.closest&&ev.target.closest("button,[role=button]")&&ev.target.getClientRects().length)return;
+  if(["KeyW","KeyA","KeyS","KeyD","Space","ArrowUp","ArrowDown","ArrowLeft","ArrowRight"].includes(gameKey))ev.preventDefault();
+  if(!ev.repeat&&gameKey==="Space"&&G.state==="playing")triggerZuohua(true);
+  if(!ev.repeat&&gameKey==="KeyF")doBlink();
+  if(!ev.repeat&&(gameKey==="Escape"||gameKey==="KeyP"))togglePause();
+  if(G.state==="playing"&&gameKey)keys[gameKey]=true;
 });
-addEventListener("keyup",ev=>keys[ev.code]=false);
+addEventListener("keyup",ev=>{const gameKey=getGameKey(ev);if(gameKey)keys[gameKey]=false;});
 document.getElementById("zuohuaBtn").onclick=()=>{triggerZuohua(true);};
 document.getElementById("pauseBtn").onclick=()=>togglePause();
 //==================== 伤害/护盾 ====================
