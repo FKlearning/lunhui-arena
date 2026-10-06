@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<title>轮回沙场 v0.9.8 · 苔庭遗梦</title>
+<title>轮回沙场 v0.9.9 · 苔庭遗梦</title>
 <style>
 :root{--ink:#24473e;--muted:#63745f;--paper:#fbf0cb;--paper2:#f0dfaa;--gold:#c38b36;--mint:#78b7a0;--night:#153d36;--border:#a58b51}
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -209,7 +209,7 @@ body.menu-open>.hud,body.menu-open>#skillbar,body.menu-open>#zuohuaBtn,body.menu
   </div>
 </div></div>
 
-<div id="hint">下方摇杆移动 / WASD · 闪现按钮 · 空格坐化 · ESC暂停</div>
+<div id="hint">↑↓←→ / 摇杆移动 · 闪现按钮 · 空格坐化 · Esc暂停</div>
 <div class="overlay" id="samsaraConfirmOverlay" role="dialog" aria-modal="true" aria-labelledby="samsaraConfirmTitle" style="z-index:85">
   <div class="card" style="width:480px">
     <h2 id="samsaraConfirmTitle">结束本轮，兑换轮回印？</h2>
@@ -226,9 +226,9 @@ body.menu-open>.hud,body.menu-open>#skillbar,body.menu-open>#zuohuaBtn,body.menu
   <div class="tag">每次告别，都会留下一个并肩作战的自己。</div>
   <div class="intro-resource"><div>轮回印 <b id="introSeals">0</b></div><button class="btn btn-secondary" id="metaShopBtn">轮回殿 · 永久强化</button></div>
   <div id="saveWarn" style="display:none;font-size:12px;padding:8px 12px;border:1px solid #b79850;margin-bottom:10px;line-height:1.5">当前浏览器无法保存进度，关闭页面后数据会丢失。请在允许本地存储的浏览器中游玩。</div>
-  <div class="howto"><div><b>移动</b>　摇杆 / WASD / 方向键</div><div><b>闪现</b>　习得后按 F 或蓝色按钮</div><div><b>坐化</b>　空格 · 保留 100% 遗念战力</div><div><b>质变</b>　每 60 秒迎战首领</div></div>
+  <div class="howto"><div><b>移动</b>　↑↓←→ 方向键 / 摇杆</div><div><b>闪现</b>　习得后按 F 或蓝色按钮</div><div><b>坐化</b>　空格 · 保留 100% 遗念战力</div><div><b>质变</b>　每 60 秒迎战首领</div></div>
   <div class="intro-actions"><button class="btn btn-primary" id="startBtn">继续轮回</button><button class="btn btn-secondary" id="newGameBtn">新的轮回</button></div>
-  <div class="intro-footer"><span>WASD 移动 · 自动战斗 · ESC 暂停</span><button class="text-btn" id="introTutorialBtn">沙场手记</button><button class="text-btn sound-toggle" onclick="toggleSound()">音效：开</button><span>v0.9.8</span></div>
+  <div class="intro-footer"><span>↑↓←→ 移动 · 自动战斗 · Esc 暂停</span><button class="text-btn" id="introTutorialBtn">沙场手记</button><button class="text-btn sound-toggle" onclick="toggleSound()">音效：开</button><span>v0.9.9</span></div>
 </div></div>
 
 <div class="overlay" id="metaShopOverlay" role="dialog" aria-modal="true" aria-labelledby="shopTitle"><div class="card" id="metaShopCard">
@@ -953,12 +953,12 @@ function getGameKey(ev){
   const key=String(ev.key||"").toLowerCase();
   return GAME_KEY_ALIASES[key]||LEGACY_GAME_KEYS[ev.keyCode||ev.which]||code;
 }
-const DEFAULT_CONTROL_HINT="下方摇杆移动 / WASD · 闪现按钮 · 空格坐化 · ESC暂停";
+const DEFAULT_CONTROL_HINT="↑↓←→ / 摇杆移动 · 闪现按钮 · 空格坐化 · Esc暂停";
 function refreshKeyboardFocusHint(forcePrompt=false){
   const hint=document.getElementById("hint");
   if(!hint)return;
   const needsFocus=forcePrompt||(G.state==="playing"&&document.activeElement!==canvas);
-  hint.textContent=needsFocus?"点击游戏画面后按 WASD 移动 · 闪现按钮 · 空格坐化 · ESC暂停":DEFAULT_CONTROL_HINT;
+  hint.textContent=needsFocus?"点击游戏画面，再按 ↑↓←→ 移动":DEFAULT_CONTROL_HINT;
   hint.classList.toggle("focus-needed",needsFocus);
 }
 function focusGameCanvas(){
@@ -1631,7 +1631,7 @@ function updateHealthHUD(){
 }
 //==================== 新手引导 ====================
 const TUTORIAL_STEPS=[
-  {t:"先走两步，熟悉沙场",d:"左下摇杆控制移动。电脑可用 WASD 或方向键；角色会自动攻击，保持移动、捡起经验，就是最好的开局。",target:null},
+  {t:"先走两步，熟悉沙场",d:"电脑优先使用 ↑↓←→ 方向键移动，WASD 也可使用；手机拖动左下摇杆。角色会自动攻击，保持移动、捡起经验，就是最好的开局。",target:null},
   {t:"悟道 · 每次只选一张",d:"三张卡片已经备好。先看技能与数值，再选择一个强化。白、绿、蓝、紫、橙依次提高品质；新技能会拓展你的战斗方式。",target:"#choices"},
   {t:"精英潮即将来袭",d:"每 25 秒出现一波精英。它们更坚韧，也掉落更多经验。先拉开距离，再收下奖励；不要被敌人包围。",target:null},
   {t:"把这一世，留在沙场",d:"空格或金色按钮可主动坐化，遗念保留 100% 战力。被击败时只保留 60%。培养一身好技能，再选择留下自己。",target:"#zuohuaBtn"},
